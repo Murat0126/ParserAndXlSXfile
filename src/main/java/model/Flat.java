@@ -2,19 +2,10 @@ package model;
 
 public class Flat {
 
-    private String phoneNumber;
-    private String rooms;
-    private String series;
-    private int place;
-    private String floor;
-    private String updateDate;
-    private String headText;
-    private int price;
-    private String createDate;
+    private String phoneNumber, rooms, series, place, floor, updateDate, headText, price, createDate, views;
 
-
-    public Flat(int price, String phoneNumbers, String rooms, String series,
-                int place, String floor, String createDate, String updateDate, String headText) {
+    public Flat(String price, String phoneNumbers, String rooms, String series,
+                String place, String floor, String createDate, String updateDate,String views, String headText) {
 
         this.price = price;
         this.phoneNumber = phoneNumbers;
@@ -25,9 +16,9 @@ public class Flat {
         this.updateDate = updateDate;
         this.createDate = createDate;
         this.headText = headText;
+        this.views = views;
 
     }
-
 
 
     public String getPhoneNumber() {
@@ -42,7 +33,7 @@ public class Flat {
         return series;
     }
 
-    public int getPlace() {
+    public String getPlace() {
         return place;
     }
 
@@ -62,9 +53,14 @@ public class Flat {
         return createDate;
     }
 
-
-    public int getPrice() {
+    public String getPrice() {
         return price;
     }
+
+    public String getViews() {
+        return views;
+    }
+
+
 
 }

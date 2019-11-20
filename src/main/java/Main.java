@@ -1,20 +1,28 @@
-import websites.stroka.StrokaKg;
-import websites.stroka.doska.DoskaKg;
+import gui.swing.controller.MainFrameController;
 
 import java.io.IOException;
-import java.text.ParseException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 
 public class Main {
 
-    public static void main(String[] args) throws IOException, ParseException {
-
+    public static void main(String[] args) throws IOException {
 
         System.out.println("args =  Main started!!!" );
 
-        new DoskaKg();
+        MainFrameController mainFrameController = new MainFrameController();
+        mainFrameController.showMainFrameWindow();
 
+        ExecutorService executorService = Executors.newFixedThreadPool(3);
+
+      executorService.shutdown();
 
 
 
     }
+
+
+
+
 }

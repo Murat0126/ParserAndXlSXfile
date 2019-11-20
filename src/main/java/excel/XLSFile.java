@@ -1,11 +1,15 @@
 package excel;
 
+import gui.swing.controller.MainFrameController;
+import gui.swing.view.MainFrame;
 import model.Flat;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import javax.swing.*;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,23 +17,36 @@ import java.util.List;
 
 public class XLSFile {
 
-    private static String[] columns = {"Цена $", "Телефон", "Комнаты","Серия", "Площадь (м'2')","Этаж", "Дата создания","Дата продления","Описание"};
-    String fileName = "data";
-    Workbook workbook = new XSSFWorkbook();
+    private static String[] columns = {"Цена $", "Телефон", "Комнаты","Серия", "Площадь (м'2')",
+            "Этаж", "Дата создания","Дата продления","Просмотры", "Описание"};
+     private String fileName;
+    private Workbook workbook = new XSSFWorkbook();
 
-    private static List<Flat> flats = new ArrayList<Flat>();
-    Sheet sheet;
+    private static List<Flat> flats = new ArrayList<>();
+    private Sheet sheet;
+    private MainFrame mainFrame;
+    private JTextField pathFileTextField;
+//    JTextPane textPane = mainFrame.getTextPane();
 
-    public XLSFile(String sheetName, List<Flat> flats  ) throws IOException {
+    public XLSFile(String sheetName, List<Flat> flats, String fileName, MainFrame mainFrame) throws IOException {
 
         XLSFile.flats = flats;
+        this.fileName = fileName;
+        this.mainFrame = mainFrame;
+
+
         createSheet(sheetName);
         createRows(XLSFile.flats);
 
+
+
+
+
     }
 
+    private void createSheet(String sheetName){
 
-    public void createSheet(String sheetName){
+
 
         System.out.println("args =  creATE Sheet" );
 
@@ -58,18 +75,39 @@ public class XLSFile {
 
     }
 
-    public void createXLSXFile(String fileName) throws IOException {
+    public void createXLSXFile() throws IOException {
 
         System.out.println("args =  creATE XLSX File" );
+        pathFileTextField = mainFrame.getPathFileTextField();
+        String pathUri = pathFileTextField.getText();
+        JTextPane textPane = mainFrame.getTextPane();
 
-        File currDir = new File(".");
-        String path = currDir.getAbsolutePath();
-        String fileLocation = path.substring(0, path.length() - 1) + fileName+".xlsx";
+        try {
 
-        FileOutputStream outputStream = new FileOutputStream(fileLocation);
-        workbook.write(outputStream);
+            File currDir = new File(pathUri);
+            String path = currDir.getAbsolutePath();
+            System.out.println("args =  File Name: " +  fileName);
+            String fileLocation = path+"\\" + fileName+".xlsx";
 
-        workbook.close();
+            FileOutputStream outputStream = new FileOutputStream(fileLocation);
+            workbook.write(outputStream);
+
+            workbook.close();
+
+
+            textPane.setText("Завершено и создано" + fileName+".xlsx файл.");
+            textPane.setText("Путь к созданным doc. файлам: " + fileLocation);
+
+
+            System.out.println(fileLocation);
+
+        }catch (FileNotFoundException f){
+            JLabel jLabel = mainFrame.getErrorTextLabel();
+            jLabel.setVisible(true);
+            textPane.setText("Процесс не может получить доступ к" + fileName + "\n"+" так как этот файл занят другим процессом");
+            jLabel.setText("Процесс не может получить доступ к" + fileName + "\n"+". , так как этот файл занят другим процессом");
+        }
+
 
     }
 
@@ -93,6 +131,7 @@ public class XLSFile {
             row.createCell(colNum++).setCellValue(flat.getFloor());
             row.createCell(colNum++).setCellValue(flat.getCreateDate());
             row.createCell(colNum++).setCellValue(flat.getUpdateDate());
+            row.createCell(colNum++).setCellValue(flat.getViews());
             row.createCell(colNum++).setCellValue(flat.getHeadText());
 
             System.out.println(flat.getPrice()+ flat.getPhoneNumber()+ flat.getRooms()+ flat.getSeries()+ flat.getPlace()+ flat.getFloor()+ flat.getCreateDate()
@@ -105,9 +144,12 @@ public class XLSFile {
             sheet.autoSizeColumn(i);
         }
 
-        createXLSXFile(fileName);
+        createXLSXFile();
 
     }
+
+
+
 
 
 

@@ -1,12 +1,14 @@
 package websites.stroka;
 
 import excel.XLSFile;
+import gui.swing.view.MainFrame;
 import model.Flat;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -18,11 +20,18 @@ public class Parser {
     private static List<Flat> flats =  new ArrayList<Flat>();
     int count;
 
-    public Parser(Element element) throws IOException {
+    public Parser(MainFrame mainFrame) throws IOException {
+
+        Document doc = (Document) Jsoup.connect("http://stroka.kg").get();
+        Element element = doc.getElementsByAttributeValue("class", "topics-list").first();
 
         System.out.print("Started stroka.class.Parser");
-        parsing(element);
-        for(int i = 0; i < 1; i++){
+//        parsing(element);
+
+        JTextField pagesOfStroka = mainFrame.getPagesOfStroka();
+        int pagesNumber = Integer.parseInt(pagesOfStroka.getText());
+
+        for(int i = 0; i <= pagesNumber; i++){
             if(i > 0){
                 Document document = (Document) Jsoup.connect("https://stroka.kg/kupit-kvartiru/?&p=" + i + "#paginator").get();
                 Element element1 = document.getElementsByAttributeValue("class", "topics-list").first();
@@ -30,6 +39,12 @@ public class Parser {
             }
 
         }
+
+        JTextPane textPane = mainFrame.getTextPane();
+        textPane.setText("Загрузка данных stroka. Завершена");
+
+
+        new XLSFile("stroka.kg", flats, "StrokaKg", mainFrame);
 
     }
 
@@ -57,7 +72,7 @@ public class Parser {
                 org.jsoup.select.Elements viewName = doc.getElementsByClass("topic-best-view-name-parent");
                 String floorof = floorOf.text();
 
-                int  price =Integer.valueOf(title.text());
+                String  price = title.text();
                 String rooms =countRooms.text();
                 String phoneNumbers =phoneNumber.text().replace(',', ' ');
                 String series =serie.text();
@@ -65,18 +80,18 @@ public class Parser {
                 String updateDate =  extractDigits(dateUpdate.text(), "Дата продления:");
                 String createDate = extractDigits(dateCreate.text(), "Дата создания:") ;
                 String headText = viewName.text().replace(',', ' ');
-                int place=0;
-                if (places.text().equals("")){
-//                    String plc = String.valueOf(place);
-//                    = "                 ";
-                }else{
-                    place =Integer.valueOf(places.text());
-                }
+                String place= "";
+                if (!places.text().equals("")) place = places.text();
+
+                String views = "";
+
+
 
 
 //                rows.add(Arrays.asList(price, phoneNumbers, rooms, series, place, floor,createDate,updateDate, headText));
 
-                flats.add(new Flat(price, phoneNumbers, rooms, series, place, floor,createDate,updateDate, headText));
+                if(!(price.equals("") & rooms.equals("") & series.equals("") & place.equals("") & floor.equals("") & createDate.equals("") & updateDate.equals("") & headText.equals("")))
+                flats.add(new Flat(price, phoneNumbers, rooms, series, place, floor,createDate,updateDate, views, headText));
                 count = count + 1;
 //                System.out.print("Строка: " + count);
                 System.out.println("rows: " + flats.size());
@@ -88,9 +103,9 @@ public class Parser {
 
         }
 
-        new XLSFile("stroka.kg", flats);
 
     }
+
 
     public String extractDigits(String source, String delete)  {
         int startNum = delete.length()+1;

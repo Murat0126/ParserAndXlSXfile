@@ -1,26 +1,25 @@
 package websites.stroka;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
+import gui.swing.view.MainFrame;
 
 import java.io.IOException;
-import java.text.ParseException;
 
-public class StrokaKg {
+public class StrokaKg implements Runnable {
 
+    private MainFrame mainFrame;
 
-
-    public StrokaKg() throws IOException, ParseException {
-
-        Document document = (Document) Jsoup.connect("http://stroka.kg").get();
-        Element tableVerb = document.getElementsByAttributeValue("class", "topics-list").first();
-        System.out.println("Started class.Stroka");
-
-        new Parser(tableVerb);
-
+    public StrokaKg(MainFrame mainFrame) {
+        this.mainFrame = mainFrame;
     }
 
+    @Override
+    public void run() {
 
-
+        try {
+            System.out.println("Started class.Stroka");
+            new Parser(mainFrame);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
